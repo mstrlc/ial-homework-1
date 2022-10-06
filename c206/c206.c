@@ -107,7 +107,29 @@ void DLL_Dispose( DLList *list ) {
  */
 void DLL_InsertFirst( DLList *list, int data )
 {
+	// Allocate needed space for the new element
+	DLLElementPtr newElement = (DLLElementPtr)malloc(sizeof(struct DLLElement));
 	
+	if (newElement == NULL)
+	{
+		DLL_Error();
+		return;
+	}
+
+	newElement->data = data;
+	newElement->nextElement = list->firstElement;
+	newElement->previousElement = NULL;
+
+	if (list->firstElement != NULL)
+	{
+		list->firstElement->previousElement = newElement;
+	}
+	else
+	{
+		list->lastElement = newElement;
+	}
+	
+	list->firstElement = newElement;
 }
 
 /**
@@ -173,8 +195,30 @@ void DLL_GetLast( DLList *list, int *dataPtr ) {
  *
  * @param list Ukazatel na inicializovanou strukturu dvousměrně vázaného seznamu
  */
-void DLL_DeleteFirst( DLList *list ) {
-	solved = FALSE; /* V případě řešení, smažte tento řádek! */
+void DLL_DeleteFirst( DLList *list )
+{
+	DLLElementPtr element;
+
+	if (list->firstElement != NULL)
+	{
+		element = list->firstElement;
+		
+		if (list->activeElement == list->firstElement)
+		{
+			list->activeElement = NULL;
+		}
+		if(list->firstElement == list->lastElement)
+		{
+			list->firstElement = NULL;
+			list->lastElement = NULL;
+		}
+		else
+		{
+			list->firstElement = list->firstElement->nextElement;
+			list->firstElement->previousElement = NULL;
+		}
+		free(element);
+	}
 }
 
 /**
@@ -206,8 +250,26 @@ void DLL_DeleteAfter( DLList *list ) {
  *
  * @param list Ukazatel na inicializovanou strukturu dvousměrně vázaného seznamu
  */
-void DLL_DeleteBefore( DLList *list ) {
-	solved = FALSE; /* V případě řešení, smažte tento řádek! */
+void DLL_DeleteBefore( DLList *list ) 
+{
+	if (list->activeElement != NULL)
+	{
+		if (list->activeElement->previousElement != NULL)
+		{
+			DLLElementPtr element = list->activeElement->previousElement;
+			list->activeElement->previousElement = element->previousElement;
+			
+			if (element == list->firstElement)
+			{
+				list->firstElement = list->activeElement;
+			}
+			else
+			{
+				element->previousElement->nextElement = list->activeElement;
+			}
+			free(element);
+		}
+	}
 }
 
 /**
@@ -220,7 +282,30 @@ void DLL_DeleteBefore( DLList *list ) {
  * @param data Hodnota k vložení do seznamu za právě aktivní prvek
  */
 void DLL_InsertAfter( DLList *list, int data ) {
-	solved = FALSE; /* V případě řešení, smažte tento řádek! */
+	if (list->activeElement != NULL)
+	{
+		DLLElementPtr newElement = (DLLElementPtr)malloc(sizeof(struct DLLElement));
+		
+		if (newElement == NULL)
+		{
+			DLL_Error();
+			return;
+		}
+
+		newElement->data = data;
+		newElement->nextElement = list->activeElement->nextElement;
+		newElement->previousElement = list->activeElement;
+		list->activeElement->nextElement = newElement;
+
+		if (list->activeElement == list->lastElement)
+		{
+			list->lastElement = newElement;
+		}
+		else
+		{
+			newElement->nextElement->previousElement = newElement;
+		}
+	}
 }
 
 /**
