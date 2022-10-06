@@ -74,6 +74,7 @@ void List_Error() {
  */
 void List_Init( List *list )
 {
+	// Initialize list to NULL values
 	list->activeElement = NULL;
 	list->firstElement = NULL;
 }
@@ -87,12 +88,13 @@ void List_Init( List *list )
  **/
 void List_Dispose( List *list )
 {
-	// go through the list elements and free every single one
+	// Go through all elements in the list in order, starting with firstElement
 	while (list->firstElement != NULL)
 	{
-		ListElementPtr element = list->firstElement;
-		list->firstElement = element->nextElement;
-		free(element);
+		// Store deleted element so we can access next one after its deletion
+		ListElementPtr toRemove = list->firstElement;
+		list->firstElement = toRemove->nextElement;
+		free(toRemove);
 	}	
 }
 
@@ -106,6 +108,7 @@ void List_Dispose( List *list )
  */
 void List_InsertFirst( List *list, int data )
 {
+	// Allocate needed space for the new element
 	ListElementPtr newElement = (ListElementPtr)malloc(sizeof(struct ListElement));
 	
 	if (newElement == NULL)
@@ -114,8 +117,10 @@ void List_InsertFirst( List *list, int data )
 		return;
 	}
 
+	// Fill new element with data and move it to the front of the list
 	newElement->data = data;
 	newElement->nextElement = list->firstElement;
+	// New element now becomes first
 	list->firstElement = newElement;
 }
 
@@ -139,6 +144,7 @@ void List_First( List *list )
  */
 void List_GetFirst( List *list, int *dataPtr )
 {
+	// If first element is not NULL, the list is not empty
 	if (list->firstElement != NULL)
 	{
 		*dataPtr = list->firstElement->data;
@@ -157,14 +163,18 @@ void List_GetFirst( List *list, int *dataPtr )
  *
  * @param list Ukazatel na inicializovanou strukturu jednosměrně vázaného seznamu
  */
-void List_DeleteFirst( List *list ) {
+void List_DeleteFirst( List *list )
+{
+	// If first element is not NULL, the list is not empty
 	if (list->firstElement != NULL)
 	{
 		ListElementPtr toRemove = list->firstElement;
+		// If removed element is active, remove activity in the list
 		if (toRemove == list->activeElement)
 		{
 			list->activeElement = NULL;
 		}
+		// Make the second element first
 		list->firstElement = toRemove->nextElement;
 		free(toRemove);
 	}
@@ -179,6 +189,7 @@ void List_DeleteFirst( List *list ) {
  */
 void List_DeleteAfter( List *list )
 {
+	// If active element is not NULL or it is not the last element
 	if (list->activeElement != NULL && list->activeElement->nextElement != NULL)
 	{
 		ListElementPtr toRemove = list->activeElement->nextElement;
@@ -208,6 +219,7 @@ void List_InsertAfter( List *list, int data )
 			return;
 		}
 
+		// Fill new element with data and place it between the active and the next element
 		newElement->data = data;
 		newElement->nextElement = list->activeElement->nextElement;
 		list->activeElement->nextElement = newElement;
@@ -225,6 +237,7 @@ void List_GetValue( List *list, int *dataPtr )
 {
 	if (list->activeElement != NULL)
 	{
+		// Return active element data using the pointer if exists
 		*dataPtr = list->activeElement->data;
 	}
 	else
@@ -260,6 +273,7 @@ void List_Next( List *list )
 {
 	if (list->activeElement != NULL)
 	{
+		// Move active element by one to the next
 		list->activeElement = list->activeElement->nextElement;
 	}
 }
