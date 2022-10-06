@@ -41,7 +41,7 @@
 **
 ** Při implementaci jednotlivých funkcí nevolejte žádnou z funkcí
 ** implementovaných v rámci tohoto příkladu, není-li u funkce explicitně
- * uvedeno něco jiného.
+** uvedeno něco jiného.
 **
 ** Nemusíte ošetřovat situaci, kdy místo legálního ukazatele na seznam
 ** předá někdo jako parametr hodnotu NULL.
@@ -78,8 +78,12 @@ void DLL_Error() {
  *
  * @param list Ukazatel na strukturu dvousměrně vázaného seznamu
  */
-void DLL_Init( DLList *list ) {
-	solved = FALSE; /* V případě řešení, smažte tento řádek! */
+void DLL_Init( DLList *list )
+{
+	// Initialize the list to empty
+	list->activeElement = NULL;
+	list->firstElement = NULL;
+	list->lastElement = NULL;
 }
 
 /**
@@ -101,8 +105,9 @@ void DLL_Dispose( DLList *list ) {
  * @param list Ukazatel na inicializovanou strukturu dvousměrně vázaného seznamu
  * @param data Hodnota k vložení na začátek seznamu
  */
-void DLL_InsertFirst( DLList *list, int data ) {
-	solved = FALSE; /* V případě řešení, smažte tento řádek! */
+void DLL_InsertFirst( DLList *list, int data )
+{
+	
 }
 
 /**
