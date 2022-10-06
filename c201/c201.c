@@ -87,14 +87,13 @@ void List_Init( List *list )
  **/
 void List_Dispose( List *list )
 {
-	ListElementPtr deletedElement = list->firstElement;
-
-	while (deletedElement != NULL)
+	// go through the list elements and free every single one
+	while (list->firstElement != NULL)
 	{
-		ListElementPtr tempElement = deletedElement->nextElement;
-		free(deletedElement);
-		deletedElement = tempElement;
-	}
+		ListElementPtr element = list->firstElement;
+		list->firstElement = element->nextElement;
+		free(element);
+	}	
 }
 
 /**
@@ -128,7 +127,7 @@ void List_InsertFirst( List *list, int data )
  */
 void List_First( List *list )
 {
-	list->activeElement = list->activeElement;
+	list->activeElement = list->firstElement;
 }
 
 /**
@@ -180,7 +179,7 @@ void List_DeleteFirst( List *list ) {
  */
 void List_DeleteAfter( List *list )
 {
-	if (list->activeElement != NULL || list->activeElement->nextElement != NULL)
+	if (list->activeElement != NULL && list->activeElement->nextElement != NULL)
 	{
 		ListElementPtr toRemove = list->activeElement->nextElement;
 		list->activeElement->nextElement = toRemove->nextElement;
