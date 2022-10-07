@@ -102,11 +102,13 @@ void Queue_Init( Queue *queue )
 		return;
 	}
 
+	// Go through the queue and set all values to '*'
 	for (int i = 0; i < QUEUE_SIZE; i++)
 	{
 		queue->array[i] = '*';
 	}
 
+	// Initialize first and free index
 	queue->firstIndex = 0;
 	queue->freeIndex = 0;
 }
@@ -120,6 +122,7 @@ void Queue_Init( Queue *queue )
  */
 int nextIndex( int index )
 {
+	// Return next index, if it is bigger than max, loops back to 0
 	return (index + 1) % QUEUE_SIZE;
 }
 
@@ -131,6 +134,7 @@ int nextIndex( int index )
  */
 int Queue_IsEmpty( const Queue *queue )
 {
+	// If first and free index are equal, the queue is empty
 	return (queue->firstIndex == queue->freeIndex);
 }
 
@@ -143,6 +147,7 @@ int Queue_IsEmpty( const Queue *queue )
  */
 int Queue_IsFull( const Queue *queue )
 {
+	// If next index of free index is equal to first index, the queue is full
 	return (nextIndex(queue->freeIndex) == queue->firstIndex);
 }
 
@@ -167,6 +172,7 @@ void Queue_Front( const Queue *queue, char *dataPtr )
 		return;
 	}
 
+	// Return first element of queue
 	*dataPtr = queue->array[queue->firstIndex];
 }
 
@@ -186,6 +192,7 @@ void Queue_Remove( Queue *queue )
 		return;
 	}
 
+	// Set first index to next index, thus removing the first element
 	queue->firstIndex = nextIndex(queue->firstIndex);
 }
 
@@ -207,7 +214,9 @@ void Queue_Dequeue( Queue *queue, char *dataPtr )
 		return;
 	}
 
+	// Get first element of queue, load it to dataPtr
 	Queue_Front(queue, dataPtr);
+	// Remove it from the queue now that it's loaded
 	Queue_Remove(queue);
 }
 
@@ -231,7 +240,9 @@ void Queue_Enqueue( Queue *queue, char data )
 		return;
 	}
 
+	// Save data to freeIndex
 	queue->array[queue->freeIndex] = data;
+	// Increment freeIndex
 	queue->freeIndex = nextIndex(queue->freeIndex);
 }
 
