@@ -95,7 +95,10 @@ void List_Dispose( List *list )
 		ListElementPtr toRemove = list->firstElement;
 		list->firstElement = toRemove->nextElement;
 		free(toRemove);
-	}	
+	}
+
+	list->activeElement = NULL;
+	list->firstElement = NULL;
 }
 
 /**
