@@ -105,6 +105,7 @@ void DLL_Dispose( DLList *list )
 		free(toRemove);
 	}
 	
+	// Initialize the list to empty
 	list->activeElement = NULL;
 	list->firstElement = NULL;
 	list->lastElement = NULL;
@@ -123,6 +124,7 @@ void DLL_InsertFirst( DLList *list, int data )
 	// Allocate needed space for the new element
 	DLLElementPtr newElement = (DLLElementPtr)malloc(sizeof(struct DLLElement));
 	
+	// Malloc fail
 	if (newElement == NULL)
 	{
 		DLL_Error();
@@ -133,15 +135,18 @@ void DLL_InsertFirst( DLList *list, int data )
 	newElement->nextElement = list->firstElement;
 	newElement->previousElement = NULL;
 
+	// If the not empty, move new element before first
 	if (list->firstElement != NULL)
 	{
 		list->firstElement->previousElement = newElement;
 	}
+	// If not, set the last element to the new one
 	else
 	{
 		list->lastElement = newElement;
 	}
 	
+	// Set the first element to the new one
 	list->firstElement = newElement;
 }
 
@@ -168,15 +173,18 @@ void DLL_InsertLast( DLList *list, int data )
 	newElement->nextElement = NULL;
 	newElement->previousElement = list->lastElement;
 
+	// If the not empty, move new element after last
 	if (list->lastElement != NULL)
 	{
 		list->lastElement->nextElement = newElement;
 	}
+	// If it is, set the first element to the new one
 	else
 	{
 		list->firstElement = newElement;
 	}
 
+	// Set the last element to the new one
 	list->lastElement = newElement;
 }
 
@@ -255,27 +263,30 @@ void DLL_GetLast( DLList *list, int *dataPtr )
  */
 void DLL_DeleteFirst( DLList *list )
 {
-	DLLElementPtr element;
-
+	// If the list is not empty
 	if (list->firstElement != NULL)
 	{
-		element = list->firstElement;
+		// First element is to be deleted
+		DLLElementPtr toRemove = list->firstElement;
 		
+		// Deactivate element
 		if (list->activeElement == list->firstElement)
 		{
 			list->activeElement = NULL;
 		}
+		// If first is also last, it is the only element of the list
 		if(list->firstElement == list->lastElement)
 		{
 			list->firstElement = NULL;
 			list->lastElement = NULL;
 		}
+		// If not, make the second element the first one
 		else
 		{
 			list->firstElement = list->firstElement->nextElement;
 			list->firstElement->previousElement = NULL;
 		}
-		free(element);
+		free(toRemove);
 	}
 }
 
@@ -288,22 +299,24 @@ void DLL_DeleteFirst( DLList *list )
  */
 void DLL_DeleteLast( DLList *list )
 {
-	DLLElementPtr toRemove;
-
+	// If the list is not empty
 	if (list->lastElement != NULL)
 	{
-		toRemove = list->lastElement;
+		// Last element is to be deleted
+		DLLElementPtr toRemove = list->lastElement;
 		
+		// Deactivate element
 		if (list->activeElement == list->lastElement)
 		{
 			list->activeElement = NULL;
 		}
-
+		// If first is also last, it is the only element of the list
 		if(list->firstElement == list->lastElement)
 		{
 			list->firstElement = NULL;
 			list->lastElement = NULL;
 		}
+		// If not, make the penultimate element last
 		else
 		{
 			list->lastElement = toRemove->previousElement;
@@ -323,19 +336,27 @@ void DLL_DeleteLast( DLList *list )
  */
 void DLL_DeleteAfter( DLList *list )
 {
+	// If the activeElement exists and is not the last one
 	if (list->activeElement != NULL && list->activeElement != list->lastElement)
 	{
+		// If the active is not the last one
 		if (list->activeElement->nextElement != NULL)
 		{
+			// Element to be deleted
 			DLLElementPtr toRemove = list->activeElement->nextElement;
+			
+			// Step over the deleted element
 			list->activeElement->nextElement = toRemove->nextElement;
 			
+			// If the deleted element is the last one
 			if (toRemove == list->lastElement)
 			{
+				// Move the last element to the previous one
 				list->lastElement = toRemove->previousElement;
 			}
 			else
 			{
+				// Step over the deleted element
 				toRemove->previousElement->nextElement = toRemove->nextElement;
 			}
 			free(toRemove);
@@ -352,19 +373,27 @@ void DLL_DeleteAfter( DLList *list )
  */
 void DLL_DeleteBefore( DLList *list ) 
 {
+	// If the activeElement exists
 	if (list->activeElement != NULL)
 	{
+		// If the active is not the first one
 		if (list->activeElement->previousElement != NULL)
 		{
+			// Element to be deleted
 			DLLElementPtr toRemove = list->activeElement->previousElement;
+			
+			// Step over the deleted element
 			list->activeElement->previousElement = toRemove->previousElement;
 			
+			// If the deleted element is the first one
 			if (toRemove == list->firstElement)
 			{
+				// Make active element the first one
 				list->firstElement = list->activeElement;
 			}
 			else
 			{
+				// Step over the deleted element
 				toRemove->previousElement->nextElement = list->activeElement;
 			}
 			free(toRemove);
@@ -383,27 +412,36 @@ void DLL_DeleteBefore( DLList *list )
  */
 void DLL_InsertAfter( DLList *list, int data )
 {
+	// If the activeElement exists
 	if (list->activeElement != NULL)
 	{
+		// Allocate memory for the new element
 		DLLElementPtr newElement = (DLLElementPtr)malloc(sizeof(struct DLLElement));
 		
+		// Malloc error
 		if (newElement == NULL)
 		{
 			DLL_Error();
 			return;
 		}
 
+		// Set new element data
 		newElement->data = data;
 		newElement->nextElement = list->activeElement->nextElement;
 		newElement->previousElement = list->activeElement;
+		
+		// Insert new element after the active element
 		list->activeElement->nextElement = newElement;
 
+		// If the active element is the last one
 		if (list->activeElement == list->lastElement)
 		{
+			// Make the new element the last one
 			list->lastElement = newElement;
 		}
 		else
 		{
+			// Step over the new element
 			newElement->nextElement->previousElement = newElement;
 		}
 	}
@@ -420,28 +458,36 @@ void DLL_InsertAfter( DLList *list, int data )
  */
 void DLL_InsertBefore( DLList *list, int data )
 {
+	// If the activeElement exists
 	if (list->activeElement != NULL)
 	{
+		// Allocate memory for the new element
 		DLLElementPtr newElement = (DLLElementPtr)malloc(sizeof(struct DLLElement));
 		
+		// Malloc error
 		if (newElement == NULL)
 		{
 			DLL_Error();
 			return;
 		}
 
+		// Set new element data
 		newElement->data = data;
 		newElement->nextElement = list->activeElement;
 		newElement->previousElement = list->activeElement->previousElement;
 
+		// Insert new element before the active element
 		list->activeElement->previousElement = newElement;
 
+		// If the active element is the first one
 		if (list->activeElement == list->firstElement)
 		{
+			// Make the new element the first one
 			list->firstElement = newElement;
 		}
 		else
 		{
+			// Step over the new element
 			newElement->previousElement->nextElement = newElement;
 		}
 	}
